@@ -1,6 +1,9 @@
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
+import Footer from "../components/Footer";
+import HowItWorks from "../components/HowItWorks";
+import { Link } from "react-router-dom";
 
 export default function Landing() {
   return (
@@ -8,7 +11,9 @@ export default function Landing() {
       <Navbar />
       <Hero />
       <Features />
-      <h1 className="text-4xl text-center mt-10">Landing Page</h1>
+      <HowItWorks />
+      <Footer />
+      {/* <h1 className="text-4xl text-center mt-10">Landing Page</h1> */}
     </div>
   );
 }
