@@ -6,10 +6,12 @@ import {
   ChevronLeft, 
   PanelLeftClose, 
   PanelLeftOpen,
-  History 
+  History ,
+  Settings as SettingsIcon 
 } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import Settings from '../../pages/Settings';
 
 const SidebarLink = ({ icon, label, to, isCollapsed }) => {
   const location = useLocation();
@@ -104,6 +106,12 @@ export default function Sidebar() {
           icon={<History size={20} />} 
           label="Transactions" 
           to="/transactions" 
+          isCollapsed={isCollapsed} 
+        />
+        <SidebarLink 
+          icon={<SettingsIcon size={20} />} 
+          label="Settings" 
+          to="/settings" 
           isCollapsed={isCollapsed} 
         />
       </nav>

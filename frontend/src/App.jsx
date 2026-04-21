@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Goals from "./pages/Goals";
 import Transactions from "./pages/Transactions";
+import Settings from "./pages/Settings";
 
 
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/dashboard" element={ <ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/goals" element={<Goals />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Router>
   );
