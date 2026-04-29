@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus } from "lucide-react";
 import { PrimaryButton } from "./TxButtons";
-import { CAT_STYLE } from "./transactionsData";
+import { CAT_STYLE } from "../constants/transactionsData";
 
 export default function AddTransactionModal({ isOpen, onClose }) {
   return (

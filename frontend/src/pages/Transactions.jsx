@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 
-import { ALL_TRANSACTIONS, ROWS_PER_PAGE } from "../components/Transactions/transactionsData";
+import { ALL_TRANSACTIONS, ROWS_PER_PAGE } from "../constants/transactionsData";
 import TransactionsHeader     from "../components/Transactions/TransactionsHeader";
 import TransactionsStatsGrid  from "../components/Transactions/TransactionsStatsGrid";
 import TransactionsToolbar    from "../components/Transactions/TransactionsToolbar";

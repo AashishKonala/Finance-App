@@ -1,5 +1,5 @@
 import { CheckCircle2, XCircle } from "lucide-react";
-import { CAT_STYLE } from "./transactionsData";
+import { CAT_STYLE } from "../constants/transactionsData";
 
 export function CategoryBadge({ category }) {
   const s = CAT_STYLE[category] || CAT_STYLE.Utility;

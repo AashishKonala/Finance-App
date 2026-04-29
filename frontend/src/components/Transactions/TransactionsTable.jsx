@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { CategoryBadge, StatusChip } from "./TxBadges";
-import { ICON_BG } from "./transactionsData";
+import { ICON_BG } from "../constants/transactionsData";
 
 const COLUMNS = ["Transaction", "Category", "Date", "Status", "Amount"];
 
