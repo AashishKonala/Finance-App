@@ -5,8 +5,13 @@ import GoalsHeader from "../components/goals/GoalsHeader";
 import SavingsGoalCard from "../components/goals/SavingsGoalCard";
 import SavingSummaryCard from "../components/goals/SavingSummaryCard";
 import CategoryGrid from "../components/goals/CategoryGrid";
+import { useGoalStore } from "../store/useGoalStore";
+
 
 const Goals = () => {
+  const monthlyGoal = useGoalStore((state) => state.monthlyGoal);
+  const expenseCategories = useGoalStore((state) => state.expenseCategories);
+  const savingSummary = useGoalStore((state) => state.savingSummary);
   return (
     /* 1. Wrapper matches Dashboard: Fixed height, hidden overflow, flex for Sidebar */
     <div className="h-screen bg-[#050505] text-white flex overflow-hidden relative font-sans">
@@ -39,8 +44,19 @@ const Goals = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-8"
           >
-            <SavingsGoalCard />
-            <SavingSummaryCard />
+            <SavingsGoalCard
+              achieved={monthlyGoal.achieved}
+              target={monthlyGoal.target}
+              startDate={monthlyGoal.startDate}
+              endDate={monthlyGoal.endDate}
+            /> 
+            {/* <SavingSummaryCard /> */}
+            <SavingSummaryCard
+  month={savingSummary.month}
+  currentData={savingSummary.currentData}
+  previousData={savingSummary.previousData}
+  labels={savingSummary.labels}
+/>
           </motion.div>
 
           {/* BOTTOM SECTION: Category Grid */}
@@ -49,7 +65,8 @@ const Goals = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <CategoryGrid />
+            <CategoryGrid categories={expenseCategories} /> 
+            {/* <CategoryGrid />  */}
           </motion.div>
 
         </div>
