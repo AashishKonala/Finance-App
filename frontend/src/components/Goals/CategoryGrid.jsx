@@ -1,29 +1,40 @@
 import CategoryCard from "./CategoryCard";
-import { Home, Utensils, Car, Film, ShoppingBag, LayoutGrid } from "lucide-react";
+import {
+  Home,
+  Utensils,
+  Car,
+  Film,
+  ShoppingBag,
+  LayoutGrid,
+} from "lucide-react";
 
-const CategoryGrid = () => {
-  const expenseCategories = [
-    { id: 1, label: 'Housing', amount: '$250.00', icon: Home },
-    { id: 2, label: 'Food', amount: '$250.00', icon: Utensils },
-    { id: 3, label: 'Transportation', amount: '$250.00', icon: Car },
-    { id: 4, label: 'Entertainment', amount: '$250.00', icon: Film },
-    { id: 5, label: 'Shopping', amount: '$250.00', icon: ShoppingBag },
-    { id: 6, label: 'Others', amount: '$250.00', icon: LayoutGrid },
-  ];
+const iconMap = {
+  Housing: Home,
+  Food: Utensils,
+  Transportation: Car,
+  Entertainment: Film,
+  Shopping: ShoppingBag,
+  Others: LayoutGrid,
+};
 
+const CategoryGrid = ({ categories = [] }) => {
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold">Expenses Goals by Category</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {expenseCategories.map((cat) => (
-          <CategoryCard 
-            key={cat.id}
-            icon={cat.icon}
-            label={cat.label}
-            amount={cat.amount}
-          />
-        ))}
+        {categories.map((cat) => {
+          const Icon = iconMap[cat.label] || LayoutGrid;
+
+          return (
+            <CategoryCard
+              key={cat.id}
+              icon={Icon}
+              label={cat.label}
+              amount={`₹${cat.amount.toLocaleString()}`}
+            />
+          );
+        })}
       </div>
     </div>
   );

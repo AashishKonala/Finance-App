@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { CategoryBadge, StatusChip } from "./TxBadges";
-import { ICON_BG } from "../constants/transactionsData";
+import { ICON_BG } from "../../constants/transactionsData";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const COLUMNS = ["Transaction", "Category", "Date", "Status", "Amount"];
 
@@ -95,7 +96,7 @@ export default function TransactionsTable({ rows }) {
                       }
                       <span className={`text-sm font-semibold font-mono ${tx.type === "credit" ? "text-emerald-400" : "text-red-400"}`}>
                         {tx.type === "credit" ? "+" : "−"}$
-                        {Math.abs(tx.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        {formatCurrency(Math.abs(tx.amount))}
                       </span>
                     </div>
                   </td>

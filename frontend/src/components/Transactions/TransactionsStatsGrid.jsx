@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 export default function TransactionsStatsGrid({ transactions }) {
   const totalIncome = transactions
@@ -13,12 +14,12 @@ export default function TransactionsStatsGrid({ transactions }) {
   const netBalance   = totalIncome - totalExpenses;
   const pendingCount = transactions.filter((t) => t.status === "pending").length;
 
-  const fmt = (n) => n.toLocaleString("en-US", { minimumFractionDigits: 2 });
+  const fmt = (n) => n.toLocaleString("en-IN", { minimumFractionDigits: 2 });
 
   const stats = [
-    { label: "Total Income",   value: `$${fmt(totalIncome)}`,   color: "text-emerald-400", change: "+8.4% vs last month",  up: true  },
-    { label: "Total Expenses", value: `$${fmt(totalExpenses)}`, color: "text-red-400",     change: "+2.1% vs last month",  up: false },
-    { label: "Net Balance",    value: `$${fmt(netBalance)}`,    color: "text-white",       change: "+12.6% vs last month", up: true  },
+    { label: "Total Income",   value: formatCurrency(totalIncome),   color: "text-emerald-400", change: "+8.4% vs last month",  up: true  },
+    { label: "Total Expenses", value: formatCurrency(totalExpenses), color: "text-red-400",     change: "+2.1% vs last month",  up: false },
+    { label: "Net Balance",    value: formatCurrency(netBalance),    color: "text-white",       change: "+12.6% vs last month", up: true  },
     { label: "Transactions",   value: `${transactions.length}`, color: "text-white",       change: `${pendingCount} pending`, up: null },
   ];
 

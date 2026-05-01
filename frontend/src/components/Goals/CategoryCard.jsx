@@ -16,7 +16,7 @@ const CategoryCard = ({ icon: Icon, label, amount }) => {
       </div>
 
       <button className="px-4 py-1.5 border border-white/10 rounded-lg text-xs font-mono hover:border-blue-500/40 hover:bg-blue-500/10 transition flex items-center gap-2">
-        ADJUST <PencilLine size={12} />
+        ADJUSTING <PencilLine size={12} />
       </button>
     </div>
   );

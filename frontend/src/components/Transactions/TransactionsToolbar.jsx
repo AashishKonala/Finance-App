@@ -1,6 +1,6 @@
 import { Search, Calendar } from "lucide-react";
 import { GlassButton } from "./TxButtons";
-import { TABS } from "../constants/transactionsData";
+import { TABS } from "../../constants/transactionsData";
 
 export default function TransactionsToolbar({
   activeTab,

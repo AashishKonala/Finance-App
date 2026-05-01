@@ -1,77 +1,68 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { ALL_TRANSACTIONS } from "../constants/transactionsData";
 
-export const useTransactionStore = create((set, get) => ({
-  transactions: [],
+export const useTransactionStore = create(
+  persist(
+    (set, get) => ({
+      transactions: [],
 
-  // 🔹 Set all transactions (initial load / API)
-  setTransactions: (data) => set({ transactions: data }),
+      addTransaction: (tx) =>
+        set((state) => ({
+          transactions: [tx, ...state.transactions],
+        })),
 
-  // 🔹 Add new transaction
-  addTransaction: (tx) =>
-    set((state) => ({
-      transactions: [tx, ...state.transactions],
-    })),
+      deleteTransaction: (id) =>
+        set((state) => ({
+          transactions: state.transactions.filter((t) => t.id !== id),
+        })),
 
-  // 🔹 Delete transaction
-  deleteTransaction: (id) =>
-    set((state) => ({
-      transactions: state.transactions.filter((t) => t.id !== id),
-    })),
+      updateTransaction: (updatedTx) =>
+        set((state) => ({
+          transactions: state.transactions.map((t) =>
+            t.id === updatedTx.id ? updatedTx : t
+          ),
+        })),
 
-  // 🔹 Update transaction
-  updateTransaction: (updatedTx) =>
-    set((state) => ({
-      transactions: state.transactions.map((t) =>
-        t.id === updatedTx.id ? updatedTx : t
-      ),
-    })),
+      resetTransactions: () =>
+        set({
+          transactions: ALL_TRANSACTIONS,
+        }),
 
-  // 🔥 ===== DERIVED DATA (VERY IMPORTANT) =====
+      clearTransactions: () =>
+        set({
+          transactions: [],
+        }),
 
-  // 🔹 Total Balance
-  getBalance: () =>
-    get().transactions.reduce((sum, t) => sum + t.amount, 0),
+      getBalance: () =>
+        get().transactions.reduce((sum, t) => sum + t.amount, 0),
 
-  // 🔹 Total Income
-  getIncome: () =>
-    get().transactions
-      .filter((t) => t.type === "credit")
-      .reduce((sum, t) => sum + t.amount, 0),
+      getIncome: () =>
+        get().transactions
+          .filter((t) => t.type === "credit")
+          .reduce((sum, t) => sum + t.amount, 0),
 
-  // 🔹 Total Expense
-  getExpense: () =>
-    get().transactions
-      .filter((t) => t.type === "debit")
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0),
+      getExpense: () =>
+        get().transactions
+          .filter((t) => t.type === "debit")
+          .reduce((sum, t) => sum + Math.abs(t.amount), 0),
+    }),
+    {
+      name: "transactions-storage",
 
-  // 🔹 Recent Transactions (for dashboard)
-  getRecentTransactions: (limit = 5) =>
-    [...get().transactions]
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, limit),
+      merge: (persistedState, currentState) => {
+        if (!persistedState?.transactions?.length) {
+          return {
+            ...currentState,
+            transactions: ALL_TRANSACTIONS,
+          };
+        }
 
-  // 🔹 Filter by Category
-  getByCategory: (category) =>
-    get().transactions.filter((t) => t.category === category),
-
-  // 🔹 Filter by Type (credit/debit)
-  getByType: (type) =>
-    get().transactions.filter((t) => t.type === type),
-
-  // 🔹 Monthly Expense (basic analytics)
-  getMonthlyExpense: () => {
-    const monthly = {};
-
-    get().transactions.forEach((t) => {
-      if (t.type === "debit") {
-        const month = new Date(t.date).toLocaleString("default", {
-          month: "short",
-        });
-
-        monthly[month] = (monthly[month] || 0) + Math.abs(t.amount);
-      }
-    });
-
-    return monthly;
-  },
-}));
+        return {
+          ...currentState,
+          ...persistedState,
+        };
+      },
+    }
+  )
+);
