@@ -18,6 +18,8 @@ export default function AddTransactionModal({ isOpen, onClose }) {
 
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const validateForm = () => {
     const newErrors = {};
@@ -55,44 +57,56 @@ export default function AddTransactionModal({ isOpen, onClose }) {
       [key]: value,
     });
 
-    // remove error while user starts fixing the field
     if (errors[key]) {
       setErrors({
         ...errors,
         [key]: "",
       });
     }
+
+    if (apiError) {
+      setApiError("");
+    }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (saving) return;
+
     const isValid = validateForm();
 
     if (!isValid) return;
 
-    const amountValue = Number(form.amount);
+    try {
+      setSaving(true);
+      setApiError("");
 
-    const newTx = {
-      id: Date.now(),
-      name: form.name.trim(),
-      amount:
-        form.type === "debit"
-          ? -Math.abs(amountValue)
-          : Math.abs(amountValue),
-      desc: form.desc.trim(),
-      category: form.category,
-      type: form.type,
-    };
+      const newTx = {
+        name: form.name.trim(),
+        amount: Number(form.amount),
+        desc: form.desc.trim(),
+        category: form.category,
+        type: form.type,
+      };
 
-    addTransaction(newTx);
+      await addTransaction(newTx);
 
-    setForm(initialForm);
-    setErrors({});
-    onClose();
+      setForm(initialForm);
+      setErrors({});
+      setApiError("");
+      onClose();
+    } catch (error) {
+      setApiError(error.message || "Failed to save transaction");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleClose = () => {
+    if (saving) return;
+
     setForm(initialForm);
     setErrors({});
+    setApiError("");
     onClose();
   };
 
@@ -114,7 +128,6 @@ export default function AddTransactionModal({ isOpen, onClose }) {
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="flex justify-between items-start px-5 py-4 border-b border-white/[0.06]">
               <div>
                 <p className="text-base font-medium">Add Transaction</p>
@@ -125,13 +138,13 @@ export default function AddTransactionModal({ isOpen, onClose }) {
 
               <button
                 onClick={handleClose}
-                className="text-gray-500 hover:text-gray-200 transition-colors"
+                disabled={saving}
+                className="text-gray-500 hover:text-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <X size={16} />
               </button>
             </div>
 
-            {/* Body */}
             <div className="p-5 space-y-4">
               {[
                 {
@@ -162,8 +175,9 @@ export default function AddTransactionModal({ isOpen, onClose }) {
                     type={f.type}
                     placeholder={f.placeholder}
                     value={form[f.key]}
+                    disabled={saving}
                     onChange={(e) => handleChange(f.key, e.target.value)}
-                    className={`w-full bg-white/[0.03] border rounded-xl px-3 py-2.5 text-sm font-mono text-gray-200 placeholder-gray-700 outline-none transition-all ${
+                    className={`w-full bg-white/[0.03] border rounded-xl px-3 py-2.5 text-sm font-mono text-gray-200 placeholder-gray-700 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       errors[f.key]
                         ? "border-red-500/50 focus:border-red-500"
                         : "border-white/10 focus:border-blue-500/40"
@@ -179,7 +193,6 @@ export default function AddTransactionModal({ isOpen, onClose }) {
               ))}
 
               <div className="grid grid-cols-2 gap-3">
-                {/* Category */}
                 <div>
                   <label className="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1.5">
                     Category
@@ -187,8 +200,9 @@ export default function AddTransactionModal({ isOpen, onClose }) {
 
                   <select
                     value={form.category}
+                    disabled={saving}
                     onChange={(e) => handleChange("category", e.target.value)}
-                    className={`w-full bg-white/[0.03] border rounded-xl px-3 py-2.5 text-sm font-mono text-gray-200 outline-none transition-all ${
+                    className={`w-full bg-white/[0.03] border rounded-xl px-3 py-2.5 text-sm font-mono text-gray-200 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       errors.category
                         ? "border-red-500/50 focus:border-red-500"
                         : "border-white/10 focus:border-blue-500/40"
@@ -208,7 +222,6 @@ export default function AddTransactionModal({ isOpen, onClose }) {
                   )}
                 </div>
 
-                {/* Type */}
                 <div>
                   <label className="block text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1.5">
                     Type
@@ -216,8 +229,9 @@ export default function AddTransactionModal({ isOpen, onClose }) {
 
                   <select
                     value={form.type}
+                    disabled={saving}
                     onChange={(e) => handleChange("type", e.target.value)}
-                    className={`w-full bg-white/[0.03] border rounded-xl px-3 py-2.5 text-sm font-mono text-gray-200 outline-none transition-all ${
+                    className={`w-full bg-white/[0.03] border rounded-xl px-3 py-2.5 text-sm font-mono text-gray-200 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       errors.type
                         ? "border-red-500/50 focus:border-red-500"
                         : "border-white/10 focus:border-blue-500/40"
@@ -235,12 +249,20 @@ export default function AddTransactionModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Save Button */}
+              {apiError && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-3 py-2">
+                  <p className="text-[11px] text-red-400 font-mono">
+                    {apiError}
+                  </p>
+                </div>
+              )}
+
               <div className="pt-1">
                 <PrimaryButton
                   icon={<Plus size={14} />}
-                  label="Save Transaction"
+                  label={saving ? "Saving..." : "Save Transaction"}
                   onClick={handleSave}
+                  disabled={saving}
                 />
               </div>
             </div>

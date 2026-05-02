@@ -1,68 +1,119 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { ALL_TRANSACTIONS } from "../constants/transactionsData";
 
-export const useTransactionStore = create(
-  persist(
-    (set, get) => ({
-      transactions: [],
+const API_URL = "http://localhost:5000/api/transactions";
 
-      addTransaction: (tx) =>
-        set((state) => ({
-          transactions: [tx, ...state.transactions],
-        })),
+export const useTransactionStore = create((set, get) => ({
+  transactions: [],
+  loading: false,
+  error: null,
 
-      deleteTransaction: (id) =>
-        set((state) => ({
-          transactions: state.transactions.filter((t) => t.id !== id),
-        })),
+  fetchTransactions: async () => {
+    try {
+      set({ loading: true, error: null });
 
-      updateTransaction: (updatedTx) =>
-        set((state) => ({
-          transactions: state.transactions.map((t) =>
-            t.id === updatedTx.id ? updatedTx : t
-          ),
-        })),
+      const res = await fetch(API_URL);
+      const result = await res.json();
 
-      resetTransactions: () =>
-        set({
-          transactions: ALL_TRANSACTIONS,
-        }),
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to fetch transactions");
+      }
 
-      clearTransactions: () =>
-        set({
-          transactions: [],
-        }),
-
-      getBalance: () =>
-        get().transactions.reduce((sum, t) => sum + t.amount, 0),
-
-      getIncome: () =>
-        get().transactions
-          .filter((t) => t.type === "credit")
-          .reduce((sum, t) => sum + t.amount, 0),
-
-      getExpense: () =>
-        get().transactions
-          .filter((t) => t.type === "debit")
-          .reduce((sum, t) => sum + Math.abs(t.amount), 0),
-    }),
-    {
-      name: "transactions-storage",
-
-      merge: (persistedState, currentState) => {
-        if (!persistedState?.transactions?.length) {
-          return {
-            ...currentState,
-            transactions: ALL_TRANSACTIONS,
-          };
-        }
-
-        return {
-          ...currentState,
-          ...persistedState,
-        };
-      },
+      set({
+        transactions: result.data,
+        loading: false,
+      });
+      console.log("Fetched transactions:", result);
+    } catch (error) {
+      set({
+        error: error.message,
+        loading: false,
+      });
     }
-  )
-);
+  },
+
+  addTransaction: async (tx) => {
+    try {
+      set({ loading: true, error: null });
+
+      const payload = {
+        name: tx.name,
+        amount: Math.abs(Number(tx.amount)),
+        desc: tx.desc,
+        category: tx.category,
+        type: tx.type,
+      };
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to add transaction");
+      }
+
+      set((state) => {
+  const alreadyExists = state.transactions.some(
+    (t) => t._id === result.data._id
+  );
+
+  if (alreadyExists) {
+    return {
+      loading: false,
+    };
+  }
+
+  return {
+    transactions: [result.data, ...state.transactions],
+    loading: false,
+  };
+});
+
+      return result.data;
+    } catch (error) {
+      set({
+        error: error.message,
+        loading: false,
+      });
+
+      throw error;
+    }
+  },
+
+  deleteTransaction: (id) =>
+    set((state) => ({
+      transactions: state.transactions.filter(
+        (t) => t._id !== id && t.id !== id
+      ),
+    })),
+
+  updateTransaction: (updatedTx) =>
+    set((state) => ({
+      transactions: state.transactions.map((t) =>
+        t._id === updatedTx._id || t.id === updatedTx.id ? updatedTx : t
+      ),
+    })),
+
+  clearTransactions: () =>
+    set({
+      transactions: [],
+    }),
+
+  getBalance: () =>
+    get().transactions.reduce((sum, t) => sum + t.amount, 0),
+
+  getIncome: () =>
+    get().transactions
+      .filter((t) => t.type === "credit")
+      .reduce((sum, t) => sum + t.amount, 0),
+
+  getExpense: () =>
+    get().transactions
+      .filter((t) => t.type === "debit")
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0),
+}));

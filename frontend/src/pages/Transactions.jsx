@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 
 import { ROWS_PER_PAGE } from "../constants/transactionsData";
@@ -9,11 +9,12 @@ import TransactionsTable from "../components/Transactions/TransactionsTable";
 import TransactionsPagination from "../components/Transactions/TransactionsPagination";
 import AddTransactionModal from "../components/Transactions/AddTransactionModal";
 import Sidebar from "../components/dashboard/Sidebar";
-
 import { useTransactionStore } from "../store/useTransactionStore";
 
 export default function Transactions() {
-  const transactions = useTransactionStore((state) => state.transactions);
+const transactions = useTransactionStore((state) => state.transactions);
+const fetchTransactions = useTransactionStore((state) => state.fetchTransactions);
+  useEffect(() => {fetchTransactions();}, [fetchTransactions]);
 
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
