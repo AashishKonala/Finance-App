@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "../components/dashboard/Sidebar";
 import GoalsHeader from "../components/goals/GoalsHeader";
@@ -6,12 +6,25 @@ import SavingsGoalCard from "../components/goals/SavingsGoalCard";
 import SavingSummaryCard from "../components/goals/SavingSummaryCard";
 import CategoryGrid from "../components/goals/CategoryGrid";
 import { useGoalStore } from "../store/useGoalStore";
+import { useTransactionStore } from "../store/useTransactionStore";
 
 
 const Goals = () => {
   const monthlyGoal = useGoalStore((state) => state.monthlyGoal);
-  const expenseCategories = useGoalStore((state) => state.expenseCategories);
   const savingSummary = useGoalStore((state) => state.savingSummary);
+  const expenseCategories = useGoalStore((state) => state.expenseCategories);
+  const fetchGoals = useGoalStore((state) => state.fetchGoals);
+  const fetchTransactions = useTransactionStore(
+  (state) => state.fetchTransactions
+);
+useEffect(() => {
+  fetchGoals();
+  fetchTransactions();
+}, [fetchGoals, fetchTransactions]);
+
+  // useEffect(() => {
+  //   fetchGoals();
+  // }, [fetchGoals]);
   return (
     /* 1. Wrapper matches Dashboard: Fixed height, hidden overflow, flex for Sidebar */
     <div className="h-screen bg-[#050505] text-white flex overflow-hidden relative font-sans">
